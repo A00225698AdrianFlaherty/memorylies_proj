@@ -1,0 +1,448 @@
+/* Google Fonts */
+@import url(https://fonts.googleapis.com/css?family=Anonymous+Pro);
+
+*,
+*::after,
+*::before
+{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root
+{
+    font-size: 16px;
+}
+
+h1
+{
+    margin-left: 30px;
+    margin-top: 30px;
+    position: absolute;
+    font-size: 15px;
+    color: #19ff00;
+    z-index: 110;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+
+span
+{
+    border-right: .05em solid;
+    animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret
+{
+    50%
+    {
+        border-color: transparent;
+    }
+}
+
+#overlay
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    opacity: 0;
+    z-index: 90;
+}
+
+buttonl
+{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    min-width: 50%;
+    min-height: 100%;
+    z-index: 20;
+}
+
+buttonr
+{
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 50%;
+    min-height: 100%;
+    z-index: 20;
+}
+
+/*
+.buttonM {
+    background-color: rgba(100, 100, 255, 0.5);
+    color: black;
+    border: 2px solid rgba(0, 0, 255, 0.5);
+}
+
+.buttonM:hover {
+    background-color: rgba(0, 0, 255, 0.5);
+    color: white;
+}
+
+.buttonF {
+    background-color: rgba(255, 100, 100, 0.5);
+    color: black;
+    border: 2px solid rgba(255, 0, 0, 0.5);
+}
+
+.buttonF:hover {
+    background-color: rgba(255, 0, 0, 0.5);
+    color: white;
+}
+*/
+
+#myVideo
+{
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -30;
+}
+
+body
+{
+    --color-text: #fff;
+    --color-bg: #030303;
+    --color-link: #4b4b4b;
+    --color-link-hover: #fff;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    font-family: laca-text, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page Loader */
+.js .loading::before,
+.js .loading::after
+{
+    content: '';
+    position: fixed;
+    z-index: 1000;
+}
+
+.js .loading::before
+{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg);
+}
+
+.js .loading::after
+{
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    border-radius: 50%;
+    opacity: 0.4;
+    /*background: var(--color-link);*/
+    animation: loaderAnim 0.7s linear infinite alternate forwards;
+
+}
+
+@keyframes loaderAnim
+{
+    to
+    {
+        opacity: 1;
+        transform: scale3d(0.5, 0.5, 1);
+    }
+}
+
+a
+{
+    text-decoration: none;
+    color: var(--color-link);
+    outline: none;
+}
+
+a:hover,
+a:focus
+{
+    color: var(--color-link-hover);
+    outline: none;
+    text-decoration: underline;
+}
+
+.js-image
+{
+    max-width: 100%;
+    /*display: block;*/
+}
+
+.loaded .js-image
+{
+    opacity: 0;
+}
+
+
+canvas
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -10;
+    pointer-events: none;
+}
+
+.controlsInfoL
+{
+    float: left;
+    text-align: center;
+    margin: auto;
+}
+
+.controlsInfoR
+{
+    float: right;
+    text-align: center;
+    margin: auto;
+}
+
+.header
+{
+    /*background-color: rgba(0,0,0,0.5);*/
+    text-align: center;
+    padding: 3rem;
+    width: 550px;
+    background-blend-mode: multiply;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header__title
+{
+    font-size: 30px;
+    /*margin-right: 3rem;*/
+
+    font-weight: normal;
+    color: #ffffff;
+    text-shadow: #222222;
+}
+
+.info1
+{
+    text-align: center;
+    font-size: 21px;
+    font-weight: normal;
+    color: #ffffff;
+    text-shadow: #222222;
+    mix-blend-mode: difference;
+
+    /*letter-spacing: 0.5em;*/
+}
+
+.info2
+{
+    font-size: 21px;
+    /*margin-right: 3rem;*/
+    font-weight: normal;
+    color: #ffffff;
+    text-shadow: #222222;
+    mix-blend-mode: difference;
+
+    /*letter-spacing: 0.5em;*/
+}
+
+.info3
+{
+    font-size: 21px;
+    /*margin-right: 3rem;*/
+    font-weight: normal;
+    color: #ffffff;
+    text-shadow: #222222;
+    mix-blend-mode: difference;
+
+    /*letter-spacing: 0.5em;*/
+}
+
+.info4
+{
+    font-size: 21px;
+    /*margin-right: 3rem;*/
+    font-weight: normal;
+    color: #ffffff;
+    text-shadow: #222222;
+    mix-blend-mode: difference;
+
+    /*letter-spacing: 0.5em;*/
+}
+
+.info5
+{
+    font-size: 21px;
+    /*margin-right: 3rem;*/
+    font-weight: normal;
+    color: #ffffff;
+    text-shadow: #222222;
+    mix-blend-mode: multiply;
+
+    /*letter-spacing: 0.5em;*/
+}
+
+.controlsInfo
+{
+    margin-top: 20px;
+    font-size: 17px;
+    /*margin-right: 3rem;*/
+    font-weight: lighter;
+    color: #ffffff;
+    text-shadow: #222222;
+    mix-blend-mode: multiply;
+
+}
+
+.ml12
+{
+
+    font-size: 1.8em;
+
+}
+
+.header__title .letter
+{
+    /*display: inline-block;*/
+    line-height: 1em;
+}
+
+.info .letter
+{
+    /*display: inline-block;*/
+    line-height: 1em;
+}
+
+.info1 .letter
+{
+    /*display: inline-block;*/
+    line-height: 1em;
+}
+
+.info2 .letter
+{
+    /*display: inline-block;*/
+    line-height: 1em;
+}
+
+.info3 .letter
+{
+    /*display: inline-block;*/
+    line-height: 1em;
+}
+
+.info4 .letter
+{
+    /*display: inline-block;*/
+    line-height: 1em;
+}
+
+.info5 .letter
+{
+    /*display: inline-block;*/
+    line-height: 1em;
+}
+
+/*.info__link {*/
+/*    margin-right: 2rem;*/
+/*    color: #9b897f;*/
+/*}*/
+
+/*.info__link-important {*/
+/*    color: #fff;*/
+/*}*/
+
+.dg
+{
+    z-index: 100 !important;
+}
+
+img
+{
+    /*display: block;*/
+}
+
+.section
+{
+    min-height: 100.5vh;
+}
+
+.spaced
+{
+    padding-top: 200px;
+}
+
+.centered
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.centered .item
+{
+    margin: 0;
+}
+
+.item
+{
+    max-width: 1250px;
+    /*margin: 0 auto 30vh auto;*/
+    color: #737375;
+}
+
+.item img
+{
+    width: 100%;
+}
+
+.item__image
+{
+    margin-bottom: 1em;
+}
+
+
+.item h2
+{
+    font-size: 3rem;
+    font-weight: 500;
+    margin: 1.5rem 0 1rem;
+    color: #fff;
+    font-family: operetta-12, sans-serif;
+    cursor: default;
+}
+
+.item p
+{
+    line-height: 1.5;
+    font-size: 1.25rem;
+    max-width: 80%;
+    cursor: default;
+}
+
+@media only screen and (max-width: 900px)
+{
+    .header
+    {
+        display: block;
+        line-height: 1.5;
+    }
+
+    .info_meta .info__link
+    {
+        margin-left: 0;
+        margin-right: 2em;
+    }
+}
+
+
