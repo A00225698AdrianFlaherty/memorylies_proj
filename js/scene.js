@@ -11,14 +11,8 @@ import EffectComposer, {RenderPass, ShaderPass,} from '@johh/three-effectcompose
 //import * as THREEx from 'threex-domevents';
 
 import dat from "dat.gui";
-let VIDEOS;
 
-let video = document.getElementById( 'myVideoIntro' );
-let texture = new THREE.VideoTexture(video);
-texture.minFilter = THREE.LinearFilter;
-texture.magFilter = THREE.LinearFilter;
-texture.format = THREE.RGBFormat;
-texture.needsUpdate = true;
+
 
 
 
@@ -43,7 +37,7 @@ export default class Sketch
         this.veloValue = 0.1;
         this.radiusSize = 0.0;
 
-        this.scene.background = texture;
+
 
 
         this.width = window.innerWidth;
@@ -88,7 +82,7 @@ export default class Sketch
     {
         console.log("everything is disposed");
         this.material.dispose();
-        this.scene.background = new THREE.Color(0,0,0);
+        this.scene.background = new THREE.Color(0, 0, 0);
         this.renderer.dispose();
     }
 
@@ -102,54 +96,13 @@ export default class Sketch
             this.mouse.y = 1. - (position[1] / window.innerHeight);
         });
     }
-    addVideos(){
+
+    addVideos()
+    {
         console.log("vidyas");
     }
-    updateVideoTexture(step)
-    {
-        if(step === 1)
-        {
-            let video2 = document.getElementById( 'myVideo2' );
-            let texture2 = new THREE.VideoTexture(video2);
-            texture2.minFilter = THREE.LinearFilter;
-            texture2.magFilter = THREE.LinearFilter;
-            texture2.format = THREE.RGBFormat;
-            texture2.needsUpdate = true;
-            this.scene.background = texture2;
-        }
-        else if (step === 2)
-        {
-            let video2 = document.getElementById( 'myVideo3' );
-            let texture2 = new THREE.VideoTexture(video2);
-            texture2.minFilter = THREE.LinearFilter;
-            texture2.magFilter = THREE.LinearFilter;
-            texture2.format = THREE.RGBFormat;
-            texture2.needsUpdate = true;
-            this.scene.background = texture2;
-        }
-        else if (step === 3)
-        {
-            let video2 = document.getElementById( 'myVideo4' );
-            let texture2 = new THREE.VideoTexture(video2);
-            texture2.minFilter = THREE.LinearFilter;
-            texture2.magFilter = THREE.LinearFilter;
-            texture2.format = THREE.RGBFormat;
-            texture2.needsUpdate = true;
-            this.scene.background = texture2;
-        }
-        else if (step === 4)
-        {
-            let video2 = document.getElementById( 'myVideo5' );
-            let texture2 = new THREE.VideoTexture(video2);
-            texture2.minFilter = THREE.LinearFilter;
-            texture2.magFilter = THREE.LinearFilter;
-            texture2.format = THREE.RGBFormat;
-            texture2.needsUpdate = true;
-            this.scene.background = texture2;
-        }
 
 
-    }
 
 
     setupResize()
