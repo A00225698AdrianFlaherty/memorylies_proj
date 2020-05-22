@@ -109,8 +109,9 @@ buttonr
 
 body
 {
+    overflow: hidden;
     --color-text: #fff;
-    --color-bg: #000;
+    --color-bg: #686264;
     --color-link: #4b4b4b;
     --color-link-hover: #fff;
     color: var(--color-text);

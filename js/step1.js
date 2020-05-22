@@ -6,18 +6,18 @@ import Scene from "./scene";
 import anime from 'animejs/lib/anime.es';
 import VideosLoaded from './vendor/videosloaded'
 
-var rollCredits;
-
+let canvas;
+let audio = new Audio();
 const TWEEN = require("tween");
 let ctx;
-let pointsUp = [];
-let pointsDown = [];
 let radius = document.body.clientWidth <= 425 ? 120 : 160;
 let steps = document.body.clientWidth <= 425 ? 60 : 120;
-let interval = 360 / steps;
-
+let pointsUp = [];
+let pointsDown = [];
 let pCircle = 2 * Math.PI * radius;
 let angleExtra = 90;
+let closeEyes1;
+let closeEyes2;
 const scene = new Scene();
 let currentStep = 0;
 // helper functions
@@ -35,8 +35,7 @@ var moving = false;
 
 let introIsOn = true;
 let IMAGES;
-let VIDEOS;
-let typewriterstart = true;
+
 // calculate the viewport size
 let winsize;
 const calcWinsize = () => (winsize = {width: window.innerWidth, height: window.innerHeight});
@@ -60,11 +59,14 @@ let video3 = document.getElementById('myVideo3');
 let video4 = document.getElementById('myVideo4');
 let video5 = document.getElementById('myVideo5');
 
-
-let canvas;
+let audio1 = document.getElementById("myAudio1");
+let audio2 = document.getElementById("myAudio2");
 let running = false;
 let thisTweenTimer = 4000;
-
+let titleTimer = 4000;
+let fadeTimerTrans = 1750;
+let letterTimer = 120;
+let sentenceTimer = 2000;
 // -------------
 // Audio stuff
 // -------------
@@ -89,40 +91,23 @@ const bufferLengthR = analyserR.frequencyBinCount;
 const audioDataArrayR = new Uint8Array(bufferLengthR);
 
 
+var rollCredits = false;
+
 // Make a audio node
 
-let audio;
 
-
-//x.load();
 function loadAudio()
 {
-    localStorage.getItem("selected");
-    console.log(localStorage.getItem("selected"));
-    if (localStorage.getItem("selected") === '1')
-    {
-        audio = document.getElementById("myAudio1");
-
-    }
-    else if (localStorage.getItem("selected") === '2')
-    {
-        audio = document.getElementById("myAudio2");
-    }
+    console.log("loaded audio");
     audio.loop = false;
     audio.autoplay = false;
     audio.crossOrigin = "anonymous";
-    console.log("audioloadcall");
     // call `handleCanplay` when it music can be played
     audio.addEventListener('canplay', handleCanplay);
-    //audio.src = document.querySelector("myAudio1");
-    //audio.type = document.querySelector("audio").type;
-    // audio.src = "/audio/ML.ogg";
-
     audio.load();
-
     running = true;
-
 }
+
 
 function handleCanplay()
 {
@@ -136,51 +121,30 @@ function handleCanplay()
 
 function toggleAudio()
 {
-
     if (running === false)
     {
-
+        loadAudio();
     }
 
     if (audio.paused)
     {
-        var playPromise = audio.play();
-
-        // In browsers that don’t yet support this functionality,
-        // playPromise won’t be defined.
-        if (playPromise !== undefined)
-        {
-            playPromise.then(function ()
-            {
-                (console.log("then"));
-                // Automatic playback started!
-            }).catch(function (error)
-            {
-                console.log("error: " + error);
-                // Show a UI element to let the user manually start playback.
-            });
-        }
+        audio.play();
     }
-    else
-    {
-        audio.pause();
-    }
-
+    // else
+    // {
+    //     audio.pause();
+    // }
 }
 
-// -------------
-// Canvas stuff
-// -------------
 
 function drawLine(points)
 {
     let origin = points[0];
 
     ctx.beginPath();
-    ctx.strokeStyle = '#19ff00';
+    ctx.strokeStyle = 'rgba(0.0,255,0.0,1.0)';
     ctx.lineJoin = 'round';
     ctx.moveTo(origin.x, origin.y);
-
     for (let i = 0; i < points.length; i++)
     {
         ctx.lineTo(points[i].x, points[i].y);
@@ -195,7 +159,7 @@ function connectPoints(pointsA, pointsB)
     for (let i = 0; i < pointsA.length; i++)
     {
         ctx.beginPath();
-        ctx.strokeStyle = '#19ff00';
+        ctx.strokeStyle = 'rgba(0.0,255,0.0,1.0)';
         ctx.moveTo(pointsA[i].x, pointsA[i].y);
         ctx.lineTo(pointsB[i].x, pointsB[i].y);
         ctx.stroke();
@@ -216,7 +180,7 @@ function update(dt)
         // get the audio data and make it go from 0 to 1
         audioValue = audioDataArrayL[audioIndex] / 255;
 
-        pointsUp[i].dist = 1.1 + audioValue * 3;
+        pointsUp[i].dist = 1.1 + audioValue * 0.8;
         pointsUp[i].x = centerX + radius * Math.cos(-pointsUp[i].angle * Math.PI / 180) * pointsUp[i].dist;
         pointsUp[i].y = centerY + radius * Math.sin(-pointsUp[i].angle * Math.PI / 180) * pointsUp[i].dist;
 
@@ -224,7 +188,7 @@ function update(dt)
         // get the audio data and make it go from 0 to 1
         audioValue = audioDataArrayR[audioIndex] / 255;
 
-        pointsDown[i].dist = 0.9 + audioValue * 0.05;
+        pointsDown[i].dist = 0.9 + audioValue * 0.2;
         pointsDown[i].x = centerX + radius * Math.cos(-pointsDown[i].angle * Math.PI / 180) * pointsDown[i].dist;
         pointsDown[i].y = centerY + radius * Math.sin(-pointsDown[i].angle * Math.PI / 180) * pointsDown[i].dist;
     }
@@ -232,7 +196,7 @@ function update(dt)
 
 function updateVideoTexture(step)
 {
-    let texture2 = new THREE.VideoTexture();
+    let texture2;
     if (step === 1)
     {
         texture2 = new THREE.VideoTexture(video2);
@@ -286,11 +250,11 @@ function draw(dt)
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     drawLine(pointsUp);
     drawLine(pointsDown);
     connectPoints(pointsUp, pointsDown);
 }
-
 
 // Item
 class Item
@@ -438,19 +402,13 @@ class SmoothScroll
     constructor()
     {
 
-
-        this.selectedOption = 0;
-
         this.shouldRender = false;
-
         this.DOM = {main: document.querySelector("main")};
         // the scrollable element
         // we translate this element when scrolling (y-axis)
         this.DOM.scrollable = this.DOM.main.querySelector("div[data-scroll]");
         // the items on the page
         this.items = [];
-        this.videos = [];
-
         this.createItems();
         //this.createVideos();
         this.listenMouse();
@@ -473,31 +431,6 @@ class SmoothScroll
         };
         this.style();
         requestAnimationFrame(() => this.render());
-
-        var timer = 2500;
-
-    }
-
-    updateInfoText(selector)
-    {
-        const textWrapper = document.querySelector(selector);
-        textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
-        anime.timeline({loop: true}).add({
-            targets: selector + ' .letter',
-            translateX: [-100, 0],
-            translateZ: 0,
-            opacity: [0, 1],
-            easing: "easeOutSine",
-            duration: 1500,
-            delay: (el, i) => 600 + 30 * i
-        }).add({
-            targets: selector + ' .letter',
-            translateX: [0, 30],
-            opacity: [1, 0],
-            easing: "easeInSine",
-            duration: 1500,
-            delay: (el, i) => 200 + 30 * i
-        });
     }
 
     startCameraTransition(distance)
@@ -510,9 +443,7 @@ class SmoothScroll
             scene.camera.position.z = coords.z;
         }).onComplete(() =>
         {
-            //this.updateInfoText(".info1");
-            //moving = false;
-            currentStep++
+
         }).start();
     }
 
@@ -531,7 +462,7 @@ class SmoothScroll
             desiredXMovement = 700;
         }
         let desiredZpos = coords.z - distance;
-        const tween = new TWEEN.Tween(coords).to({x: desiredXMovement, y: coords.y, z: desiredZpos, w: 1}, 4000).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(() =>
+        const tween = new TWEEN.Tween(coords).to({x: desiredXMovement, y: coords.y, z: desiredZpos, w: 1}, thisTweenTimer).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(() =>
         {
             document.getElementById("overlay").style.opacity = coords.w;
             scene.camera.position.z = coords.z;
@@ -539,10 +470,9 @@ class SmoothScroll
         }).onComplete(() =>
         {
             $('canvas').remove();
-            currentStep++;
             scene.background = null;
             this.StartTextAnimation(0);
-
+            moving = true;
             scene.disposeEverything();
         }).start();
     }
@@ -550,7 +480,6 @@ class SmoothScroll
     fadeOverlay()
     {
         const coords = {x: scene.camera.position.x, y: scene.camera.position.y, z: scene.camera.position.z, w: 0};
-
         const tween = new TWEEN.Tween(coords).to({x: coords.x, y: coords.y, z: coords.y, w: 0}, 1500).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(() =>
         {
             document.getElementById("overlay").style.opacity = coords.w;
@@ -572,13 +501,13 @@ class SmoothScroll
             setTimeout(function ()
             {
                 that.typeWriter(text, i + 1, fnCallback)
-            }, 150);
+            }, letterTimer);
         }
         // text finished, call callback if there is a callback function
         else if (typeof fnCallback == 'function')
         {
             // call callback after timeout
-            setTimeout(fnCallback, 1500);
+            setTimeout(fnCallback, sentenceTimer);
         }
     }
 
@@ -589,22 +518,13 @@ class SmoothScroll
         {
             setTimeout(function ()
             {
-                if (!rollCredits)
+                currentStep++;
+                moving = false;
+                if(rollCredits)
                 {
-                    if (!audioIsPlaying)
-                    {
-                        timeToPlayAudioScene1 = true;
-                    }
-                    else
-                    {
-                        that.StartTextAnimation(0);
-                    }
-                }
-                else
-                {
-                    dataText = ["Credits:", "Actors-Séamus O Donnell & Órla McGovern", "Photography- Emilia Jefremova www.emjcamera.com", "Sound Design-Niall Clarke", "Web Development/Design- Adrian Flaherty", "Music-Maitiú O Casaide", "Creative Development- Roisín Staic, Darach Mac Con Ionmaire", "Research support- Dr Mary Greene", "Special thanks to Lundahl & Seitl, Alice Keane, Jane Hanberry, Galway 2020 and Galway Theatre Festival team", "Refresh to restart Memory Lies"];
                     that.StartTextAnimation(0);
                 }
+                // TO START AGAIN
 
             }, 1);
         }
@@ -638,371 +558,471 @@ class SmoothScroll
     clicked()
     {
         let distance = 50;
-        let timer = 2000;
-        if (!timeToPlayAudioScene1)
-        {
 
-            if (!introIsOn)
+        if (!introIsOn)
+        {
+            if (currentStep === 5 && !moving)
             {
-                if (currentStep === 5 && !moving)
-                {
-                    console.log("clicked 5")
-                }
-                if (currentStep === 4 && !moving)
-                {
-                    var that = this;
+                toggleAudio();
+                canvas = document.createElement("canvas");
+                canvas.style.opacity = 1;
+                canvas.style.zIndex = 1001;
+                document.getElementById("datascroll").remove();
+                document.getElementById("container").appendChild(canvas);
 
-                    moving = true;
-                    $("#controlsInfo").fadeOut(timer / 4, function ()
-                    {
-                        $("#info5").fadeOut(timer / 4, function ()
-                        {
-                            $("#info4").fadeOut(timer / 4, function ()
-                            {
-                                $("#info3").fadeOut(timer / 4, function ()
-                                {
-                                    $("#info2").fadeOut(timer / 4, function ()
-                                    {
-                                        $("#info1").fadeOut(timer / 4, function ()
-                                        {
-                                            updateVideoTexture(4);
-                                            document.getElementById("info1").innerHTML = "How do you hear your inner voice today?";
-                                            document.getElementById("info2").innerHTML = "(Select an image)";
-                                            document.getElementById("info3").innerHTML = "";
-                                            document.getElementById("info4").innerHTML = "";
-                                            document.getElementById("info5").innerHTML = "";
+                let interval = 360 / steps;
+                //canvas.style.opacity = 0;
+                ctx = canvas.getContext("2d");
+                canvas.width = screen.width;
+                canvas.height = screen.height;
 
-                                            $("#info1").fadeIn(timer, function ()
-                                            {
-                                                $("#info2").fadeIn(timer, function ()
-                                                {
-                                                    moving = false;
-                                                    //Add button left
-                                                    var buttonl = document.createElement("buttonl");
-                                                    var body = document.getElementsByTagName("body")[0];
-                                                    body.appendChild(buttonl);
-                                                    buttonl.addEventListener("click", function ()
-                                                    {
-                                                        localStorage.setItem("selected", '1');
-                                                        that.selectedOption = 1;
-                                                        loadAudio();
-                                                        that.startCameraTransitionDecision(80, that.selectedOption);
-                                                        that.startTransitionEffect();
-                                                        document.getElementById("info1").innerHTML = "";
-                                                        document.getElementById("info2").innerHTML = "";
-                                                        document.getElementById("info3").innerHTML = "";
-                                                        document.getElementById("info4").innerHTML = "";
-                                                        document.getElementById("info5").innerHTML = "";
-
-                                                    });
-
-                                                    //Add button right
-                                                    var buttonr = document.createElement("buttonr");
-                                                    body = document.getElementsByTagName("body")[0];
-                                                    body.appendChild(buttonr);
-
-
-                                                    buttonr.addEventListener("click", function ()
-                                                    {
-                                                        that.selectedOption = 2;
-
-                                                        localStorage.setItem("selected", '2');
-                                                        loadAudio();
-                                                        document.getElementById("info1").innerHTML = "";
-                                                        document.getElementById("info2").innerHTML = "";
-                                                        document.getElementById("info3").innerHTML = "";
-                                                        document.getElementById("info4").innerHTML = "";
-                                                        document.getElementById("info5").innerHTML = "";
-                                                        that.startCameraTransitionDecision(80, that.selectedOption);
-                                                        that.startTransitionEffect();
-
-                                                    });
-
-                                                });
-                                            });
-                                        });
-
-                                    });
-                                });
-                            });
-                        });
-                    });
-                    currentStep++;
-                    this.startCameraTransition(distance);
-                    this.startTransitionEffect();
-                }
-                if (currentStep === 3 && !moving)
-                {
-                    moving = true;
-                    $("#controlsInfo").fadeOut(timer / 4, function ()
-                    {
-                        $("#info5").fadeOut(timer / 4, function ()
-                        {
-                            $("#info4").fadeOut(timer / 4, function ()
-                            {
-                                $("#info3").fadeOut(timer / 4, function ()
-                                {
-                                    $("#info2").fadeOut(timer / 4, function ()
-                                    {
-                                        $("#info1").fadeOut(timer / 4, function ()
-                                        {
-                                            updateVideoTexture(3);
-                                            var text1, text2, text3, text4;
-                                            text1 = "Compliance is a non-negotiable fact";
-                                            text2 = "To fight the virus.";
-                                            text3 = "Together.";
-                                            text4 = "Apart.";
-                                            document.getElementById("info1").innerHTML = text1.italics();
-                                            document.getElementById("info2").innerHTML = text2.italics();
-                                            document.getElementById("info3").innerHTML = text3.italics();
-                                            document.getElementById("info4").innerHTML = text4.italics();
-                                            document.getElementById("info5").innerHTML = "";
-                                            $("#info1").fadeIn(timer, function ()
-                                            {
-                                                $("#info2").fadeIn(timer, function ()
-                                                {
-                                                    $("#info3").fadeIn(timer, function ()
-                                                    {
-                                                        $("#info4").fadeIn(timer, function ()
-                                                        {
-                                                            $("#controlsInfo").fadeIn(timer, function ()
-                                                            {
-                                                                moving = false;
-                                                            });
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-
-                                });
-                            });
-                        });
-                    });
-                    scene.distortValue = 0.1;
-                    this.startCameraTransition(distance);
-                    this.startTransitionEffect();
-                }
-                if (currentStep === 2 && !moving)
-                {
-                    moving = true;
-
-                    $("#controlsInfo").fadeOut(timer / 4, function ()
-                    {
-                        $("#info5").fadeOut(timer / 4, function ()
-                        {
-                            $("#info4").fadeOut(timer / 4, function ()
-                            {
-                                $("#info3").fadeOut(timer / 4, function ()
-                                {
-                                    $("#info2").fadeOut(timer / 4, function ()
-                                    {
-                                        $("#info1").fadeOut(timer / 4, function ()
-                                        {
-                                            updateVideoTexture(2);
-                                            document.getElementById("info1").innerHTML = "Do these seem familiar to you somehow?";
-                                            document.getElementById("info2").innerHTML = "Please ensure your headphones are on securely.";
-                                            document.getElementById("info3").innerHTML = "Are you in a quiet space? Comfortably isolated?";
-                                            document.getElementById("info4").innerHTML = "That's good.";
-                                            document.getElementById("info5").innerHTML = "Very good.";
-                                            $("#info1").fadeIn(timer, function ()
-                                            {
-                                                $("#info2").fadeIn(timer, function ()
-                                                {
-                                                    $("#info3").fadeIn(timer, function ()
-                                                    {
-                                                        $("#info4").fadeIn(timer, function ()
-                                                        {
-                                                            $("#info5").fadeIn(timer, function ()
-                                                            {
-
-                                                                $("#controlsInfo").fadeIn(timer, function ()
-                                                                {
-                                                                    moving = false;
-                                                                });
-                                                            });
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-
-                                    });
-                                });
-                            });
-                        });
-                    });
-                    this.startCameraTransition(distance);
-                    this.startTransitionEffect();
-                }
-                if (currentStep === 1 && !moving)
-                {
-                    moving = true;
-                    $("#controlsInfo").fadeOut(timer / 4, function ()
-                    {
-
-                        $("#info4").fadeOut(timer / 4, function ()
-                        {
-                            $("#info3").fadeOut(timer / 4, function ()
-                            {
-                                $("#info2").fadeOut(timer / 4, function ()
-                                {
-                                    $("#info1").fadeOut(timer / 4, function ()
-                                    {
-                                        $("#header_title").fadeOut(timer / 4, function ()
-                                        {
-                                            updateVideoTexture(2);
-                                            var text = "Finefagael";
-                                            document.getElementById("info1").innerHTML = "The country has been in a state of emergency for almost 40 years.";
-                                            document.getElementById("info2").innerHTML = "A prolonged period of intensive social distancing is in place.";
-                                            document.getElementById("info3").innerHTML = text.italics() + ", a new political party, rules the island of Ireland.";
-                                            document.getElementById("info4").innerHTML = "There is no opposition. There is no dissent.";
-                                            document.getElementById("info5").innerHTML = "There are no...distractions.";
-                                            $("#info1").fadeIn(timer, function ()
-                                            {
-                                                $("#info2").fadeIn(timer, function ()
-                                                {
-                                                    $("#info3").fadeIn(timer, function ()
-                                                    {
-                                                        $("#info4").fadeIn(timer, function ()
-                                                        {
-                                                            $("#info5").fadeIn(timer, function ()
-                                                            {
-                                                                $("#controlsInfo").fadeIn(timer, function ()
-                                                                {
-                                                                    moving = false;
-                                                                });
-                                                            });
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-
-                    });
-
-                    this.startCameraTransition(distance);
-                    this.startTransitionEffect();
-                }
-                if (currentStep === 0 && !moving)
-                {
-                    moving = true;
-                    $("#controlsInfo").fadeOut(timer / 4, function ()
-                    {
-                        $("#info5").fadeOut(timer / 4, function ()
-                        {
-                            $("#info4").fadeOut(timer / 4, function ()
-                            {
-                                $("#info3").fadeOut(timer / 4, function ()
-                                {
-                                    $("#info2").fadeOut(timer / 4, function ()
-                                    {
-                                        $("#info1").fadeOut(timer / 4, function ()
-                                        {
-                                            $("#header_title").fadeOut(timer / 4, function ()
-                                            {
-                                                document.getElementById("info1").innerHTML = "Don't let anything distract you now in this moment.";
-                                                document.getElementById("info2").innerHTML = "Enjoy these images you see before you. Enjoy these silent memories.";
-                                                document.getElementById("info3").innerHTML = "Remember, there should be no distractions in this moment.";
-                                                document.getElementById("info4").innerHTML = "Compliance is a non-negotiable fact... in the year 2060.";
-                                                document.getElementById("controlsInfo").innerHTML = "Click to Continue";
-                                                document.getElementById("info5").innerHTML = "";
-                                                $("#info1").fadeIn(timer, function ()
-                                                {
-                                                    $("#info2").fadeIn(timer, function ()
-                                                    {
-                                                        $("#info3").fadeIn(timer, function ()
-                                                        {
-                                                            $("#info4").fadeIn(timer, function ()
-                                                            {
-                                                                $("#controlsInfo").fadeIn(timer / 2, function ()
-                                                                {
-                                                                    moving = false;
-                                                                });
-                                                            });
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                    this.startCameraTransition(distance + 50);
-                    this.startTransitionEffect();
-                }
-            }
-        }
-        else if (!audioIsPlaying)
-        {
-            toggleAudio();
-
-            this.fadeOverlay();
-            document.getElementById("main").style.backgroundColor = "#000000";
-            //this.fadeOverlay();
-            canvas = document.createElement("canvas");
-            canvas.style.opacity = 1;
-            document.getElementById("container").appendChild(canvas);
-            document.getElementById("datascroll").remove();
-            //canvas.style.opacity = 0;
-            ctx = canvas.getContext("2d");
-            canvas.width = screen.width;
-            canvas.height = screen.height;
-
-            centerX = canvas.width / 2;
-            centerY = canvas.height / 2;
+                centerX = canvas.width / 2;
+                centerY = canvas.height / 2;
 
 
 // Create points
-            for (let angle = 0; angle < 360; angle += interval)
-            {
-                let distUp = 1.1;
-                let distDown = 0.9;
+                for (let angle = 0; angle < 360; angle += interval)
+                {
+                    let distUp = 1.1;
+                    let distDown = 0.9;
 
-                pointsUp.push({
-                    angle: angle + angleExtra,
-                    x: centerX + radius * Math.cos((-angle + angleExtra) * Math.PI / 180) * distUp,
-                    y: centerY + radius * Math.sin((-angle + angleExtra) * Math.PI / 180) * distUp,
-                    dist: distUp
-                });
+                    pointsUp.push({
+                        angle: angle + angleExtra,
+                        x: centerX + radius * Math.cos((-angle + angleExtra) * Math.PI / 180) * distUp,
+                        y: centerY + radius * Math.sin((-angle + angleExtra) * Math.PI / 180) * distUp,
+                        dist: distUp
+                    });
 
-                pointsDown.push({
-                    angle: angle + angleExtra + 5,
-                    x: centerX + radius * Math.cos((-angle + angleExtra + 5) * Math.PI / 180) * distDown,
-                    y: centerY + radius * Math.sin((-angle + angleExtra + 5) * Math.PI / 180) * distDown,
-                    dist: distDown
-                });
+                    pointsDown.push({
+                        angle: angle + angleExtra + 5,
+                        x: centerX + radius * Math.cos((-angle + angleExtra + 5) * Math.PI / 180) * distDown,
+                        y: centerY + radius * Math.sin((-angle + angleExtra + 5) * Math.PI / 180) * distDown,
+                        dist: distDown
+                    });
+                }
+
+
+                dataText = ["Communications channel open", "Signal strength: Strong", "Loading...", "Area Bandwidth: Optimal"];
+                this.StartTextAnimation(0);
+                audioIsPlaying = true;
+                //$("myAudio1").on("ended", );
+                let those = this;
+                var interval1 = setInterval(function ()
+                    {
+                        if (localStorage.getItem("selected") === '1')
+                        {
+                            console.log(audio.currentTime);
+                            if (!closeEyes1 && audio.currentTime > 326)//326
+                            {
+                                closeEyes1 = true;
+                                dataText = ["Please close your eyes", "ea6d3435", "c634d86c", "ea6d3435", "c634d86c", "..."];
+                                those.StartTextAnimation(0);
+                                $('canvas').fadeOut(3000 * Math.random(), function ()
+                                {
+                                    $('canvas').fadeIn(3000 * Math.random(), function ()
+                                    {
+                                        $('canvas').fadeOut(3000 * Math.random(), function ()
+                                        {
+                                            $('canvas').fadeIn(3000 * Math.random(), function ()
+                                            {
+                                                $('canvas').fadeOut(3000 * Math.random(), function ()
+                                                {
+                                                    $('h1').fadeOut(3000 * Math.random(), function ()
+                                                    {
+                                                        $('h1').fadeIn(3000 * Math.random(), function ()
+                                                        {
+                                                            $('h1').fadeOut(3000 * Math.random(), function ()
+                                                            {
+                                                                $('h1').fadeIn(3000 * Math.random(), function ()
+                                                                {
+                                                                    $('h1').fadeOut(3000 * Math.random(), function ()
+                                                                    {
+
+                                                                    });
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+
+                                //clearInterval(interval1);
+                            }
+                            if (!rollCredits && audio.currentTime > 1066)//1066
+                            {
+                                rollCredits = true;
+                                dataText = ["Credits:", "Actors-Séamus O Donnell & Órla McGovern", "Photography- Emilia Jefremova www.emjcamera.com", "Sound Design-Niall Clarke", "Web Development/Design- Adrian Flaherty", "Music-Maitiú O Casaide", "Creative Development- Roisín Staic, Darach Mac Con Ionmaire", "Research support- Dr Mary Greene", "Special thanks to Lundahl & Seitl, Alice Keane, Jane Hanberry, Galway 2020 and Galway Theatre Festival team", "Refresh to restart Memory Lies"];
+                                those.StartTextAnimation(0);
+                                sentenceTimer = 3000;
+                                $('h1').fadeIn(1500, function ()
+                                {
+
+                                });
+                            }
+                        }
+
+                        if (localStorage.getItem("selected") === '2')
+                        {
+                            console.log(audio.currentTime);
+                            if (!closeEyes1 && audio.currentTime > 335)//338
+                            {
+                                closeEyes1 = true;
+                                dataText = ["Please close your eyes", "ea6d3435", "c634d86c", "ea6d3435", "c634d86c"];
+                                those.StartTextAnimation(0);
+                                $('canvas').fadeOut(3000 * Math.random(), function ()
+                                {
+                                    $('canvas').fadeIn(3000 * Math.random(), function ()
+                                    {
+                                        $('canvas').fadeOut(3000 * Math.random(), function ()
+                                        {
+                                            $('canvas').fadeIn(3000 * Math.random(), function ()
+                                            {
+                                                $('canvas').fadeOut(3000 * Math.random(), function ()
+                                                {
+                                                    $('h1').fadeOut(3000 * Math.random(), function ()
+                                                    {
+                                                        $('h1').fadeIn(3000 * Math.random(), function ()
+                                                        {
+                                                            $('h1').fadeOut(3000 * Math.random(), function ()
+                                                            {
+                                                                $('h1').fadeIn(3000 * Math.random(), function ()
+                                                                {
+                                                                    $('h1').fadeOut(3000 * Math.random(), function ()
+                                                                    {
+
+                                                                    });
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            }
+                            if (!rollCredits && audio.currentTime > 964)//965
+                            {
+                                rollCredits = true;
+                                dataText = ["Credits:", "Actors-Séamus O Donnell & Órla McGovern", "Photography- Emilia Jefremova www.emjcamera.com", "Sound Design-Niall Clarke", "Web Development/Design- Adrian Flaherty", "Music-Maitiú O Casaide", "Creative Development- Roisín Staic, Darach Mac Con Ionmaire", "Research support- Dr Mary Greene", "Special thanks to Lundahl & Seitl, Alice Keane, Jane Hanberry, Galway 2020 and Galway Theatre Festival team", "Refresh to restart Memory Lies"];
+                                those.StartTextAnimation(0);
+                                sentenceTimer = 3000;
+                                clearInterval(interval1);
+
+                                $('h1').fadeIn(1500, function ()
+                                {
+
+                                });
+                            }
+                        }
+                    }
+                    , 50);
+                draw();
+                currentStep++;
             }
 
-            dataText = ["Communications channel open", "Signal strength: Strong", "Loading...", "Area Bandwidth: Optimal"];
-            this.StartTextAnimation(0);
-            audioIsPlaying = true;
-            currentStep++;
-            audio.addEventListener("ended", startCredits, false);
-            //$("myAudio1").on("ended", );
-
-            draw();
-
-            function startCredits()
+            if (currentStep === 4 && !moving)
             {
-                rollCredits = true;
-                //that.StartTextAnimation(0);
+                var that = this;
+                moving = true;
+                $("#controlsInfo").fadeOut(fadeTimerTrans / 4, function ()
+                {
+                    $("#info5").fadeOut(fadeTimerTrans / 4, function ()
+                    {
+                        $("#info4").fadeOut(fadeTimerTrans / 4, function ()
+                        {
+                            $("#info3").fadeOut(fadeTimerTrans / 4, function ()
+                            {
+                                $("#info2").fadeOut(fadeTimerTrans / 4, function ()
+                                {
+                                    $("#info1").fadeOut(fadeTimerTrans / 4, function ()
+                                    {
+                                        updateVideoTexture(4);
+                                        document.getElementById("info1").innerHTML = "How do you hear your inner voice today?";
+                                        document.getElementById("info2").innerHTML = "(Select an image)";
+                                        document.getElementById("info3").innerHTML = "";
+                                        document.getElementById("info4").innerHTML = "";
+                                        document.getElementById("info5").innerHTML = "";
+                                        $("#info1").fadeIn(fadeTimerTrans, function ()
+                                        {
+                                            $("#info2").fadeIn(fadeTimerTrans, function ()
+                                            {
+
+                                                //Add button left
+                                                var buttonl = document.createElement("buttonl");
+                                                var body = document.getElementsByTagName("body")[0];
+                                                body.appendChild(buttonl);
+                                                buttonl.addEventListener("click", function ()
+                                                {
+                                                    localStorage.setItem("selected", '1');
+                                                    that.selectedOption = 1;
+                                                    audio = audio1;
+                                                    loadAudio();
+                                                    that.startCameraTransitionDecision(80, that.selectedOption);
+                                                    that.startTransitionEffect();
+                                                    document.getElementById("info1").innerHTML = "";
+                                                    document.getElementById("info2").innerHTML = "";
+                                                    document.getElementById("info3").innerHTML = "";
+                                                    document.getElementById("info4").innerHTML = "";
+                                                    document.getElementById("info5").innerHTML = "";
+
+                                                });
+
+                                                //Add button right
+                                                var buttonr = document.createElement("buttonr");
+                                                body = document.getElementsByTagName("body")[0];
+                                                body.appendChild(buttonr);
+                                                buttonr.addEventListener("click", function ()
+                                                {
+                                                    that.selectedOption = 2;
+                                                    localStorage.setItem("selected", '2');
+                                                    audio = audio1;
+                                                    loadAudio();
+                                                    document.getElementById("info1").innerHTML = "";
+                                                    document.getElementById("info2").innerHTML = "";
+                                                    document.getElementById("info3").innerHTML = "";
+                                                    document.getElementById("info4").innerHTML = "";
+                                                    document.getElementById("info5").innerHTML = "";
+                                                    that.startCameraTransitionDecision(80, that.selectedOption);
+                                                    that.startTransitionEffect();
+                                                });
+
+                                            });
+                                        });
+                                    });
+
+                                });
+                            });
+                        });
+                    });
+                });
+                this.startCameraTransition(distance);
+                this.startTransitionEffect();
+            }
+            if (currentStep === 3 && !moving)
+            {
+                moving = true;
+                $("#controlsInfo").fadeOut(fadeTimerTrans / 4, function ()
+                {
+                    $("#info5").fadeOut(fadeTimerTrans / 4, function ()
+                    {
+                        $("#info4").fadeOut(fadeTimerTrans / 4, function ()
+                        {
+                            $("#info3").fadeOut(fadeTimerTrans / 4, function ()
+                            {
+                                $("#info2").fadeOut(fadeTimerTrans / 4, function ()
+                                {
+                                    $("#info1").fadeOut(fadeTimerTrans / 4, function ()
+                                    {
+                                        updateVideoTexture(3);
+                                        var text1, text2, text3, text4;
+                                        text1 = "Compliance is a non-negotiable fact";
+                                        text2 = "To fight the virus.";
+                                        text3 = "Together.";
+                                        text4 = "Apart.";
+                                        document.getElementById("info1").innerHTML = text1.italics();
+                                        document.getElementById("info2").innerHTML = text2.italics();
+                                        document.getElementById("info3").innerHTML = text3.italics();
+                                        document.getElementById("info4").innerHTML = text4.italics();
+                                        document.getElementById("info5").innerHTML = "";
+                                        $("#info1").fadeIn(fadeTimerTrans, function ()
+                                        {
+                                            $("#info2").fadeIn(fadeTimerTrans, function ()
+                                            {
+                                                $("#info3").fadeIn(fadeTimerTrans, function ()
+                                                {
+                                                    $("#info4").fadeIn(fadeTimerTrans, function ()
+                                                    {
+                                                        $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
+                                                        {
+                                                            moving = false;
+                                                            currentStep++
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+
+                            });
+                        });
+                    });
+                });
+                scene.distortValue = 0.1;
+                this.startCameraTransition(distance);
+                this.startTransitionEffect();
+
+            }
+            if (currentStep === 2 && !moving)
+            {
+                moving = true;
+                $("#controlsInfo").fadeOut(fadeTimerTrans / 4, function ()
+                {
+                    $("#info5").fadeOut(fadeTimerTrans / 4, function ()
+                    {
+                        $("#info4").fadeOut(fadeTimerTrans / 4, function ()
+                        {
+                            $("#info3").fadeOut(fadeTimerTrans / 4, function ()
+                            {
+                                $("#info2").fadeOut(fadeTimerTrans / 4, function ()
+                                {
+                                    $("#info1").fadeOut(fadeTimerTrans / 4, function ()
+                                    {
+                                        updateVideoTexture(2);
+                                        document.getElementById("info1").innerHTML = "Do these seem familiar to you somehow?";
+                                        document.getElementById("info2").innerHTML = "Please ensure your headphones are on securely.";
+                                        document.getElementById("info3").innerHTML = "Are you in a quiet space? Comfortably isolated?";
+                                        document.getElementById("info4").innerHTML = "That's good.";
+                                        document.getElementById("info5").innerHTML = "Very good.";
+                                        $("#info1").fadeIn(fadeTimerTrans, function ()
+                                        {
+                                            $("#info2").fadeIn(fadeTimerTrans, function ()
+                                            {
+                                                $("#info3").fadeIn(fadeTimerTrans, function ()
+                                                {
+                                                    $("#info4").fadeIn(fadeTimerTrans, function ()
+                                                    {
+                                                        $("#info5").fadeIn(fadeTimerTrans, function ()
+                                                        {
+
+                                                            $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
+                                                            {
+                                                                moving = false;
+                                                                currentStep++
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+
+                                });
+                            });
+                        });
+                    });
+                });
+                this.startCameraTransition(distance);
+                this.startTransitionEffect();
+            }
+            if (currentStep === 1 && !moving)
+            {
+                moving = true;
+                $("#controlsInfo").fadeOut(fadeTimerTrans / 4, function ()
+                {
+
+                    $("#info4").fadeOut(fadeTimerTrans / 4, function ()
+                    {
+                        $("#info3").fadeOut(fadeTimerTrans / 4, function ()
+                        {
+                            $("#info2").fadeOut(fadeTimerTrans / 4, function ()
+                            {
+                                $("#info1").fadeOut(fadeTimerTrans / 4, function ()
+                                {
+                                    $("#header_title").fadeOut(fadeTimerTrans / 4, function ()
+                                    {
+                                        updateVideoTexture(2);
+                                        var text = "Finefagael";
+                                        document.getElementById("info1").innerHTML = "The country has been in a state of emergency for almost 40 years.";
+                                        document.getElementById("info2").innerHTML = "A prolonged period of intensive social distancing is in place.";
+                                        document.getElementById("info3").innerHTML = text.italics() + ", a new political party, rules the island of Ireland.";
+                                        document.getElementById("info4").innerHTML = "There is no opposition. There is no dissent.";
+                                        document.getElementById("info5").innerHTML = "There are no...distractions.";
+                                        $("#info1").fadeIn(fadeTimerTrans, function ()
+                                        {
+                                            $("#info2").fadeIn(fadeTimerTrans, function ()
+                                            {
+                                                $("#info3").fadeIn(fadeTimerTrans, function ()
+                                                {
+                                                    $("#info4").fadeIn(fadeTimerTrans, function ()
+                                                    {
+                                                        $("#info5").fadeIn(fadeTimerTrans, function ()
+                                                        {
+                                                            $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
+                                                            {
+                                                                moving = false;
+                                                                currentStep++
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+
+                });
+
+                this.startCameraTransition(distance);
+                this.startTransitionEffect();
+            }
+            if (currentStep === 0 && !moving)
+            {
+                moving = true;
+                $("#controlsInfo").fadeOut(fadeTimerTrans / 4, function ()
+                {
+                    $("#info5").fadeOut(fadeTimerTrans / 4, function ()
+                    {
+                        $("#info4").fadeOut(fadeTimerTrans / 4, function ()
+                        {
+                            $("#info3").fadeOut(fadeTimerTrans / 4, function ()
+                            {
+                                $("#info2").fadeOut(fadeTimerTrans / 4, function ()
+                                {
+                                    $("#info1").fadeOut(fadeTimerTrans / 4, function ()
+                                    {
+                                        $("#header_title").fadeOut(fadeTimerTrans / 4, function ()
+                                        {
+                                            document.getElementById("info1").innerHTML = "Don't let anything distract you now in this moment.";
+                                            document.getElementById("info2").innerHTML = "Enjoy these images you see before you. Enjoy these silent memories.";
+                                            document.getElementById("info3").innerHTML = "Remember, there should be no distractions in this moment.";
+                                            document.getElementById("info4").innerHTML = "Compliance is a non-negotiable fact... in the year 2060.";
+                                            document.getElementById("controlsInfo").innerHTML = "Click to Continue";
+                                            document.getElementById("info5").innerHTML = "";
+                                            $("#info1").fadeIn(fadeTimerTrans, function ()
+                                            {
+                                                $("#info2").fadeIn(fadeTimerTrans, function ()
+                                                {
+                                                    $("#info3").fadeIn(fadeTimerTrans, function ()
+                                                    {
+                                                        $("#info4").fadeIn(fadeTimerTrans, function ()
+                                                        {
+                                                            $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
+                                                            {
+                                                                moving = false;
+                                                                currentStep++
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+                this.startCameraTransition(distance + 50);
+                this.startTransitionEffect();
             }
         }
+
+
     }
 
 
     startTransitionEffect()
     {
 
-        let effectValue = {x: 100};
+        let effectValue = {x: 10000};
         let halfwayValue = effectValue.x / 2;
         let tweenEffect = new TWEEN.Tween(effectValue).to({x: 0}, thisTweenTimer).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(() =>
         {
@@ -1072,16 +1092,16 @@ class SmoothScroll
         });
     }
 
-    // createVideos()
-    // {
-    //     VIDEOS.forEach(video =>
-    //     {
-    //         if (video.video.classList.contains("myVideo"))
-    //         {
-    //             this.videos.push(new MyVideo(video, this));
-    //         }
-    //     });
-    // }
+// createVideos()
+// {
+//     VIDEOS.forEach(video =>
+//     {
+//         if (video.video.classList.contains("myVideo"))
+//         {
+//             this.videos.push(new MyVideo(video, this));
+//         }
+//     });
+// }
 
     style()
     {
@@ -1127,23 +1147,12 @@ const preloadImages = new Promise((resolve, reject) =>
 });
 
 
-// const load = new Promise((resolve, reject) =>
-// {
-//     new VideosLoaded(document.querySelectorAll("video"),{background:true}, resolve);
-// });
-//
-// load.then(videos =>
-// {
-//     VIDEOS = videos.videos;
-//     console.log('Loaded videos:', VIDEOS);
-// });
-
 preloadImages.then(images =>
 {
     IMAGES = images.images;
 });
 
-const preloadEverything = [fontStarling, fontParalucent, preloadImages, videoIntro, video2, video3, video4, video5];
+const preloadEverything = [fontStarling, fontParalucent, preloadImages, videoIntro, video2, video3, video4, video5, audio1, audio2];
 
 // And then..
 Promise.all(preloadEverything).then(() =>
@@ -1157,26 +1166,26 @@ Promise.all(preloadEverything).then(() =>
     getPageYScroll();
     // Initialize the Smooth Scrolling
     new SmoothScroll();
-    var timer = 2000;
-    $(".header__title").fadeIn(timer * 2, function ()
+
+    $(".header__title").fadeIn(titleTimer * 2, function ()
     {
-        $("#info1").fadeIn(timer, function ()
+        $("#info1").fadeIn(titleTimer, function ()
         {
-            $("#info2").fadeIn(timer, function ()
+            $("#info2").fadeIn(titleTimer, function ()
             {
-                $("#info3").fadeIn(timer, function ()
+                $("#info3").fadeIn(titleTimer, function ()
                 {
-                    $("#info4").fadeIn(timer, function ()
+                    $("#info4").fadeIn(titleTimer, function ()
                     {
-                        $("#controlsInfo").fadeIn(timer / 3, function ()
+                        $("#controlsInfo").fadeIn(titleTimer / 3, function ()
                         {
 
                             introIsOn = false;
-                            //console.log("This happened" + introIsOn);
+
                         });
                     });
                 });
             });
         });
     });
-});
+}).catch(console.log);
