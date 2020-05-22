@@ -28,7 +28,6 @@ const MathUtils = {
     lerp: (a, b, n) => (1 - n) * a + n * b
 };
 let audioIsPlaying = false;
-let timeToPlayAudioScene1 = false;
 let centerX;
 let centerY;
 var moving = false;
@@ -59,14 +58,15 @@ let video3 = document.getElementById('myVideo3');
 let video4 = document.getElementById('myVideo4');
 let video5 = document.getElementById('myVideo5');
 
+let openAudio = document.getElementById("openLoop");
 let audio1 = document.getElementById("myAudio1");
 let audio2 = document.getElementById("myAudio2");
 let running = false;
 let thisTweenTimer = 4000;
-let titleTimer = 4000;
-let fadeTimerTrans = 1750;
+let titleTimer = 3000;
+let fadeTimerTrans = 2500;
 let letterTimer = 120;
-let sentenceTimer = 2000;
+let sentenceTimer = 2500;
 // -------------
 // Audio stuff
 // -------------
@@ -89,7 +89,7 @@ const audioDataArrayL = new Uint8Array(bufferLengthL);
 
 const bufferLengthR = analyserR.frequencyBinCount;
 const audioDataArrayR = new Uint8Array(bufferLengthR);
-
+let mainAudioPlaying = false;
 
 var rollCredits = false;
 
@@ -103,6 +103,10 @@ function loadAudio()
     audio.autoplay = false;
     audio.crossOrigin = "anonymous";
     // call `handleCanplay` when it music can be played
+    if (!mainAudioPlaying)
+    {
+
+    }
     audio.addEventListener('canplay', handleCanplay);
     audio.load();
     running = true;
@@ -113,6 +117,7 @@ function handleCanplay()
 {
     // connect the audio element to the analyser node and the analyser node
     // to the main Web Audio context
+
     const source = context.createMediaElementSource(audio);
     source.connect(splitter);
     splitter.connect(context.destination);
@@ -469,6 +474,7 @@ class SmoothScroll
             scene.camera.position.x = coords.x;
         }).onComplete(() =>
         {
+            openAudio.remove();
             $('canvas').remove();
             scene.background = null;
             this.StartTextAnimation(0);
@@ -520,7 +526,7 @@ class SmoothScroll
             {
                 currentStep++;
                 moving = false;
-                if(rollCredits)
+                if (rollCredits)
                 {
                     that.StartTextAnimation(0);
                 }
@@ -559,7 +565,7 @@ class SmoothScroll
     {
         let distance = 50;
 
-        if (!introIsOn)
+        if (!introIsOn && !audioIsPlaying)
         {
             if (currentStep === 5 && !moving)
             {
@@ -742,58 +748,59 @@ class SmoothScroll
                                     {
                                         updateVideoTexture(4);
                                         document.getElementById("info1").innerHTML = "How do you hear your inner voice today?";
-                                        document.getElementById("info2").innerHTML = "(Select an image)";
-                                        document.getElementById("info3").innerHTML = "";
+                                        document.getElementById("info2").innerHTML = "Male voice\t\t\t\t\tFemale voice";
+                                        document.getElementById("info3").innerHTML = "Please select an image";
                                         document.getElementById("info4").innerHTML = "";
                                         document.getElementById("info5").innerHTML = "";
                                         $("#info1").fadeIn(fadeTimerTrans, function ()
                                         {
                                             $("#info2").fadeIn(fadeTimerTrans, function ()
                                             {
-
-                                                //Add button left
-                                                var buttonl = document.createElement("buttonl");
-                                                var body = document.getElementsByTagName("body")[0];
-                                                body.appendChild(buttonl);
-                                                buttonl.addEventListener("click", function ()
+                                                $("#info3").fadeIn(fadeTimerTrans, function ()
                                                 {
-                                                    localStorage.setItem("selected", '1');
-                                                    that.selectedOption = 1;
-                                                    audio = audio1;
-                                                    loadAudio();
-                                                    that.startCameraTransitionDecision(80, that.selectedOption);
-                                                    that.startTransitionEffect();
-                                                    document.getElementById("info1").innerHTML = "";
-                                                    document.getElementById("info2").innerHTML = "";
-                                                    document.getElementById("info3").innerHTML = "";
-                                                    document.getElementById("info4").innerHTML = "";
-                                                    document.getElementById("info5").innerHTML = "";
 
+                                                    //Add button left
+                                                    var buttonl = document.createElement("buttonl");
+                                                    var body = document.getElementsByTagName("body")[0];
+                                                    body.appendChild(buttonl);
+                                                    buttonl.addEventListener("click", function ()
+                                                    {
+                                                        localStorage.setItem("selected", '1');
+                                                        that.selectedOption = 1;
+                                                        audio = audio1;
+                                                        loadAudio();
+                                                        that.startCameraTransitionDecision(80, that.selectedOption);
+                                                        that.startTransitionEffect();
+                                                        document.getElementById("info1").innerHTML = "";
+                                                        document.getElementById("info2").innerHTML = "";
+                                                        document.getElementById("info3").innerHTML = "";
+                                                        document.getElementById("info4").innerHTML = "";
+                                                        document.getElementById("info5").innerHTML = "";
+
+                                                    });
+
+                                                    //Add button right
+                                                    var buttonr = document.createElement("buttonr");
+                                                    body = document.getElementsByTagName("body")[0];
+                                                    body.appendChild(buttonr);
+                                                    buttonr.addEventListener("click", function ()
+                                                    {
+                                                        that.selectedOption = 2;
+                                                        localStorage.setItem("selected", '2');
+                                                        audio = audio1;
+                                                        loadAudio();
+                                                        document.getElementById("info1").innerHTML = "";
+                                                        document.getElementById("info2").innerHTML = "";
+                                                        document.getElementById("info3").innerHTML = "";
+                                                        document.getElementById("info4").innerHTML = "";
+                                                        document.getElementById("info5").innerHTML = "";
+                                                        that.startCameraTransitionDecision(80, that.selectedOption);
+                                                        that.startTransitionEffect();
+                                                    });
                                                 });
-
-                                                //Add button right
-                                                var buttonr = document.createElement("buttonr");
-                                                body = document.getElementsByTagName("body")[0];
-                                                body.appendChild(buttonr);
-                                                buttonr.addEventListener("click", function ()
-                                                {
-                                                    that.selectedOption = 2;
-                                                    localStorage.setItem("selected", '2');
-                                                    audio = audio1;
-                                                    loadAudio();
-                                                    document.getElementById("info1").innerHTML = "";
-                                                    document.getElementById("info2").innerHTML = "";
-                                                    document.getElementById("info3").innerHTML = "";
-                                                    document.getElementById("info4").innerHTML = "";
-                                                    document.getElementById("info5").innerHTML = "";
-                                                    that.startCameraTransitionDecision(80, that.selectedOption);
-                                                    that.startTransitionEffect();
-                                                });
-
                                             });
                                         });
                                     });
-
                                 });
                             });
                         });
@@ -818,16 +825,17 @@ class SmoothScroll
                                     $("#info1").fadeOut(fadeTimerTrans / 4, function ()
                                     {
                                         updateVideoTexture(3);
-                                        var text1, text2, text3, text4;
+                                        var text1, text2, text3, text4, text5;
                                         text1 = "Compliance is a non-negotiable fact";
-                                        text2 = "To fight the virus.";
+                                        text2 = "Stability.";
                                         text3 = "Together.";
-                                        text4 = "Apart.";
+                                        text4 = "Control.";
+                                        text5 = "Apart.";
                                         document.getElementById("info1").innerHTML = text1.italics();
                                         document.getElementById("info2").innerHTML = text2.italics();
                                         document.getElementById("info3").innerHTML = text3.italics();
                                         document.getElementById("info4").innerHTML = text4.italics();
-                                        document.getElementById("info5").innerHTML = "";
+                                        document.getElementById("info5").innerHTML = text5.italics();
                                         $("#info1").fadeIn(fadeTimerTrans, function ()
                                         {
                                             $("#info2").fadeIn(fadeTimerTrans, function ()
@@ -836,10 +844,13 @@ class SmoothScroll
                                                 {
                                                     $("#info4").fadeIn(fadeTimerTrans, function ()
                                                     {
-                                                        $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
+                                                        $("#info5").fadeIn(fadeTimerTrans, function ()
                                                         {
-                                                            moving = false;
-                                                            currentStep++
+                                                            $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
+                                                            {
+                                                                moving = false;
+                                                                currentStep++
+                                                            });
                                                         });
                                                     });
                                                 });
@@ -862,46 +873,43 @@ class SmoothScroll
                 moving = true;
                 $("#controlsInfo").fadeOut(fadeTimerTrans / 4, function ()
                 {
-                    $("#info5").fadeOut(fadeTimerTrans / 4, function ()
+                    $("#info4").fadeOut(fadeTimerTrans / 4, function ()
                     {
-                        $("#info4").fadeOut(fadeTimerTrans / 4, function ()
+                        $("#info3").fadeOut(fadeTimerTrans / 4, function ()
                         {
-                            $("#info3").fadeOut(fadeTimerTrans / 4, function ()
+                            $("#info2").fadeOut(fadeTimerTrans / 4, function ()
                             {
-                                $("#info2").fadeOut(fadeTimerTrans / 4, function ()
+                                $("#info1").fadeOut(fadeTimerTrans / 4, function ()
                                 {
-                                    $("#info1").fadeOut(fadeTimerTrans / 4, function ()
+                                    updateVideoTexture(2);
+                                    document.getElementById("info1").innerHTML = "Do these images resonate with you somehow?";
+                                    document.getElementById("info2").innerHTML = "Please ensure your headphones are on securely.";
+                                    document.getElementById("info3").innerHTML = "Are you in a quiet space?";
+                                    document.getElementById("info4").innerHTML = "That's good.";
+                                    document.getElementById("info5").innerHTML = "Very good.";
+                                    $("#info1").fadeIn(fadeTimerTrans, function ()
                                     {
-                                        updateVideoTexture(2);
-                                        document.getElementById("info1").innerHTML = "Do these seem familiar to you somehow?";
-                                        document.getElementById("info2").innerHTML = "Please ensure your headphones are on securely.";
-                                        document.getElementById("info3").innerHTML = "Are you in a quiet space? Comfortably isolated?";
-                                        document.getElementById("info4").innerHTML = "That's good.";
-                                        document.getElementById("info5").innerHTML = "Very good.";
-                                        $("#info1").fadeIn(fadeTimerTrans, function ()
+                                        $("#info2").fadeIn(fadeTimerTrans, function ()
                                         {
-                                            $("#info2").fadeIn(fadeTimerTrans, function ()
+                                            $("#info3").fadeIn(fadeTimerTrans, function ()
                                             {
-                                                $("#info3").fadeIn(fadeTimerTrans, function ()
+                                                $("#info4").fadeIn(fadeTimerTrans, function ()
                                                 {
-                                                    $("#info4").fadeIn(fadeTimerTrans, function ()
+                                                    $("#info5").fadeIn(fadeTimerTrans, function ()
                                                     {
-                                                        $("#info5").fadeIn(fadeTimerTrans, function ()
-                                                        {
 
-                                                            $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
-                                                            {
-                                                                moving = false;
-                                                                currentStep++
-                                                            });
+                                                        $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
+                                                        {
+                                                            moving = false;
+                                                            currentStep++
                                                         });
                                                     });
                                                 });
                                             });
                                         });
                                     });
-
                                 });
+
                             });
                         });
                     });
@@ -927,11 +935,11 @@ class SmoothScroll
                                     {
                                         updateVideoTexture(2);
                                         var text = "Finefagael";
-                                        document.getElementById("info1").innerHTML = "The country has been in a state of emergency for almost 40 years.";
-                                        document.getElementById("info2").innerHTML = "A prolonged period of intensive social distancing is in place.";
-                                        document.getElementById("info3").innerHTML = text.italics() + ", a new political party, rules the island of Ireland.";
-                                        document.getElementById("info4").innerHTML = "There is no opposition. There is no dissent.";
-                                        document.getElementById("info5").innerHTML = "There are no...distractions.";
+                                        document.getElementById("info1").innerHTML = "The country has been in a state of emergency since the year 2020.";
+                                        document.getElementById("info2").innerHTML = "A prolonged period of intensive social-distancing has been in place for the last 40 years.";
+                                        document.getElementById("info3").innerHTML = "There is no opposition.";
+                                        document.getElementById("info4").innerHTML = "There is no dissent.";
+                                        document.getElementById("info5").innerHTML = "";
                                         $("#info1").fadeIn(fadeTimerTrans, function ()
                                         {
                                             $("#info2").fadeIn(fadeTimerTrans, function ()
@@ -940,14 +948,13 @@ class SmoothScroll
                                                 {
                                                     $("#info4").fadeIn(fadeTimerTrans, function ()
                                                     {
-                                                        $("#info5").fadeIn(fadeTimerTrans, function ()
+
+                                                        $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
                                                         {
-                                                            $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
-                                                            {
-                                                                moving = false;
-                                                                currentStep++
-                                                            });
+                                                            moving = false;
+                                                            currentStep++
                                                         });
+
                                                     });
                                                 });
                                             });
@@ -980,8 +987,8 @@ class SmoothScroll
                                     {
                                         $("#header_title").fadeOut(fadeTimerTrans / 4, function ()
                                         {
-                                            document.getElementById("info1").innerHTML = "Don't let anything distract you now in this moment.";
-                                            document.getElementById("info2").innerHTML = "Enjoy these images you see before you. Enjoy these silent memories.";
+                                            document.getElementById("info1").innerHTML = "Don't let anything distract you now.";
+                                            document.getElementById("info2").innerHTML = "Enjoy these images you see before you. They are like memories, not entirely clear. Enjoy the silence they conjure up in your mind.";
                                             document.getElementById("info3").innerHTML = "Remember, there should be no distractions in this moment.";
                                             document.getElementById("info4").innerHTML = "Compliance is a non-negotiable fact... in the year 2060.";
                                             document.getElementById("controlsInfo").innerHTML = "Click to Continue";
@@ -1152,7 +1159,7 @@ preloadImages.then(images =>
     IMAGES = images.images;
 });
 
-const preloadEverything = [fontStarling, fontParalucent, preloadImages, videoIntro, video2, video3, video4, video5, audio1, audio2];
+const preloadEverything = [fontStarling, fontParalucent, preloadImages, videoIntro, video2, video3, video4, video5, audio1, audio2, openAudio];
 
 // And then..
 Promise.all(preloadEverything).then(() =>
@@ -1161,7 +1168,11 @@ Promise.all(preloadEverything).then(() =>
 
     document.body.classList.remove("loading");
     document.body.classList.add("loaded");
-
+    openAudio.loop = true;
+    openAudio.autoplay = true;
+    openAudio.crossOrigin = "anonymous";
+// call `handleCanplay` when it music can be played
+    openAudio.load();
     // Get the scroll position
     getPageYScroll();
     // Initialize the Smooth Scrolling
