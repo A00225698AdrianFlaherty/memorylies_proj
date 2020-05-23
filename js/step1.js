@@ -53,10 +53,18 @@ let initStep = 0;
 let docScroll;
 const getPageYScroll = () => (docScroll = window.pageYOffset || document.documentElement.scrollTop);
 let videoIntro = document.getElementById('myVideoIntro');
-let video2 = document.getElementById('myVideo2');
-let video3 = document.getElementById('myVideo3');
-let video4 = document.getElementById('myVideo4');
-let video5 = document.getElementById('myVideo5');
+videoIntro.preload = 'true';
+videoIntro.autoload = true;
+videoIntro.autoplay = 'true';
+videoIntro.load();
+videoIntro.play();
+let texture = new THREE.VideoTexture(videoIntro);
+
+texture.minFilter = THREE.LinearFilter;
+texture.magFilter = THREE.LinearFilter;
+texture.format = THREE.RGBFormat;
+texture.needsUpdate = true;
+scene.scene.background = texture;
 
 let openAudio = document.getElementById("openLoop");
 let audio1 = document.getElementById("myAudio1");
@@ -71,7 +79,9 @@ let sentenceTimer = 2500;
 // Audio stuff
 // -------------
 // make a Web Audio Context
-const context = new AudioContext();
+let context = new AudioContext();
+
+
 const splitter = context.createChannelSplitter();
 
 const analyserL = context.createAnalyser();
@@ -201,45 +211,88 @@ function update(dt)
 
 function updateVideoTexture(step)
 {
-    let texture2;
+
+
     if (step === 1)
     {
-        texture2 = new THREE.VideoTexture(video2);
-        texture2.minFilter = THREE.LinearFilter;
-        texture2.magFilter = THREE.LinearFilter;
-        texture2.format = THREE.RGBFormat;
-        texture2.needsUpdate = true;
-        scene.scene.background = texture2;
+
+        let video2 = document.getElementById('myVideo2');
+        video2.preload = 'true';
+        video2.autoload = true;
+        video2.loop = true;
+        video2.autoplay = true;
+        video2.crossOrigin = "anonymous";
+        video2.play();
+        if(texture!=null)
+        {
+            texture.dispose();
+        }
+        texture = new THREE.VideoTexture(video2);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBFormat;
+        texture.needsUpdate = true;
+        scene.scene.background = texture;
     }
     else if (step === 2)
     {
-
-        texture2 = new THREE.VideoTexture(video3);
-        texture2.minFilter = THREE.LinearFilter;
-        texture2.magFilter = THREE.LinearFilter;
-        texture2.format = THREE.RGBFormat;
-        texture2.needsUpdate = true;
-        scene.scene.background = texture2;
-
-
+        let video3 = document.getElementById('myVideo3');
+        video3.preload = 'true';
+        video3.autoload = true;
+        video3.loop = true;
+        video3.autoplay = true;
+        video3.crossOrigin = "anonymous";
+        video3.play();
+        if(texture!=null)
+        {
+            texture.dispose();
+        }
+        texture = new THREE.VideoTexture(video3);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBFormat;
+        texture.needsUpdate = true;
+        scene.scene.background = texture;
     }
     else if (step === 3)
     {
-        texture2 = new THREE.VideoTexture(video4);
-        texture2.minFilter = THREE.LinearFilter;
-        texture2.magFilter = THREE.LinearFilter;
-        texture2.format = THREE.RGBFormat;
-        texture2.needsUpdate = true;
-        scene.scene.background = texture2;
+        let video4 = document.getElementById('myVideo4');
+        video4.preload = 'true';
+        video4.autoload = true;
+        video4.loop = true;
+        video4.autoplay = true;
+        video4.crossOrigin = "anonymous";
+        video4.play();
+        if(texture!=null)
+        {
+            texture.dispose();
+        }
+        texture = new THREE.VideoTexture(video4);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBFormat;
+        texture.needsUpdate = true;
+        scene.scene.background = texture;
     }
     else if (step === 4)
     {
-        texture2 = new THREE.VideoTexture(video5);
-        texture2.minFilter = THREE.LinearFilter;
-        texture2.magFilter = THREE.LinearFilter;
-        texture2.format = THREE.RGBFormat;
-        texture2.needsUpdate = true;
-        scene.scene.background = texture2;
+        let video5 = document.getElementById('myVideo5');
+        video5.preload = 'true';
+        video5.autoload = true;
+        video5.loop = true;
+        video5.autoplay = true;
+        video5.crossOrigin = "anonymous";
+        video5.play();
+        if(texture!=null)
+        {
+            texture.dispose();
+        }
+        texture = new THREE.VideoTexture(video5);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBFormat;
+        texture.needsUpdate = true;
+        scene.scene.background = texture;
     }
 
 
@@ -271,14 +324,7 @@ class Item
         this.isBeingAnimatedNow = false;
 
         this.shouldUnRoll = false;
-        let video = document.getElementById('myVideoIntro');
 
-        let texture = new THREE.VideoTexture(video);
-        texture.minFilter = THREE.LinearFilter;
-        texture.magFilter = THREE.LinearFilter;
-        texture.format = THREE.RGBFormat;
-        texture.needsUpdate = true;
-        scene.scene.background = texture;
 
         this.getSize();
         this.mesh = scene.createMesh({
@@ -474,12 +520,13 @@ class SmoothScroll
             scene.camera.position.x = coords.x;
         }).onComplete(() =>
         {
-            openAudio.remove();
+
             $('canvas').remove();
             scene.background = null;
             this.StartTextAnimation(0);
             moving = true;
             scene.disposeEverything();
+            openAudio.remove();
         }).start();
     }
 
@@ -563,6 +610,7 @@ class SmoothScroll
 
     clicked()
     {
+
         let distance = 50;
 
         if (!introIsOn && !audioIsPlaying)
@@ -657,7 +705,7 @@ class SmoothScroll
 
                                 //clearInterval(interval1);
                             }
-                            if (!rollCredits && audio.currentTime > 1066)//1066
+                            if (!rollCredits && audio.currentTime > 1076)//1066
                             {
                                 rollCredits = true;
                                 dataText = ["Credits:", "Actors-Séamus O Donnell & Órla McGovern", "Photography- Emilia Jefremova www.emjcamera.com", "Sound Design-Niall Clarke", "Web Development/Design- Adrian Flaherty", "Music-Maitiú O Casaide", "Creative Development- Roisín Staic, Darach Mac Con Ionmaire", "Research support- Dr Mary Greene", "Special thanks to Lundahl & Seitl, Alice Keane, Jane Hanberry, Galway 2020 and Galway Theatre Festival team", "Refresh to restart Memory Lies"];
@@ -710,7 +758,7 @@ class SmoothScroll
                                     });
                                 });
                             }
-                            if (!rollCredits && audio.currentTime > 964)//965
+                            if (!rollCredits && audio.currentTime > 974)//965
                             {
                                 rollCredits = true;
                                 dataText = ["Credits:", "Actors-Séamus O Donnell & Órla McGovern", "Photography- Emilia Jefremova www.emjcamera.com", "Sound Design-Niall Clarke", "Web Development/Design- Adrian Flaherty", "Music-Maitiú O Casaide", "Creative Development- Roisín Staic, Darach Mac Con Ionmaire", "Research support- Dr Mary Greene", "Special thanks to Lundahl & Seitl, Alice Keane, Jane Hanberry, Galway 2020 and Galway Theatre Festival team", "Refresh to restart Memory Lies"];
@@ -747,18 +795,21 @@ class SmoothScroll
                                     $("#info1").fadeOut(fadeTimerTrans / 4, function ()
                                     {
                                         updateVideoTexture(4);
-                                        document.getElementById("info1").innerHTML = "How do you hear your inner voice today?";
-                                        document.getElementById("info2").innerHTML = "Male voice\t\t\t\t\tFemale voice";
-                                        document.getElementById("info3").innerHTML = "Please select an image";
+                                        var text1 = "in the future?"
+                                        document.getElementById("info1").innerHTML = "How do you hear your inner voice " + text1.bold();
+                                        document.getElementById("info2").innerHTML = "(Select an image)";
+                                        document.getElementById("info3").innerHTML = "";
                                         document.getElementById("info4").innerHTML = "";
                                         document.getElementById("info5").innerHTML = "";
                                         $("#info1").fadeIn(fadeTimerTrans, function ()
                                         {
                                             $("#info2").fadeIn(fadeTimerTrans, function ()
                                             {
-                                                $("#info3").fadeIn(fadeTimerTrans, function ()
+                                                $("#female").fadeIn(fadeTimerTrans, function ()
                                                 {
-
+                                                });
+                                                $("#male").fadeIn(fadeTimerTrans, function ()
+                                                {
                                                     //Add button left
                                                     var buttonl = document.createElement("buttonl");
                                                     var body = document.getElementsByTagName("body")[0];
@@ -776,6 +827,15 @@ class SmoothScroll
                                                         document.getElementById("info3").innerHTML = "";
                                                         document.getElementById("info4").innerHTML = "";
                                                         document.getElementById("info5").innerHTML = "";
+                                                        $("#female").fadeOut(500, function ()
+                                                        {
+                                                        });
+                                                        $("#male").fadeOut(500, function ()
+                                                        {
+                                                            $("#female").remove();
+                                                            $("#male").remove();
+                                                        });
+
 
                                                     });
 
@@ -787,7 +847,7 @@ class SmoothScroll
                                                     {
                                                         that.selectedOption = 2;
                                                         localStorage.setItem("selected", '2');
-                                                        audio = audio1;
+                                                        audio = audio2;
                                                         loadAudio();
                                                         document.getElementById("info1").innerHTML = "";
                                                         document.getElementById("info2").innerHTML = "";
@@ -826,7 +886,7 @@ class SmoothScroll
                                     {
                                         updateVideoTexture(3);
                                         var text1, text2, text3, text4, text5;
-                                        text1 = "Compliance is a non-negotiable fact";
+                                        text1 = "Compliance is a non-negotiable fact.";
                                         text2 = "Stability.";
                                         text3 = "Together.";
                                         text4 = "Control.";
@@ -863,7 +923,7 @@ class SmoothScroll
                         });
                     });
                 });
-                scene.distortValue = 0.1;
+
                 this.startCameraTransition(distance);
                 this.startTransitionEffect();
 
@@ -933,7 +993,7 @@ class SmoothScroll
                                 {
                                     $("#header_title").fadeOut(fadeTimerTrans / 4, function ()
                                     {
-                                        updateVideoTexture(2);
+                                        updateVideoTexture(1);
                                         var text = "Finefagael";
                                         document.getElementById("info1").innerHTML = "The country has been in a state of emergency since the year 2020.";
                                         document.getElementById("info2").innerHTML = "A prolonged period of intensive social-distancing has been in place for the last 40 years.";
@@ -951,6 +1011,7 @@ class SmoothScroll
 
                                                         $("#controlsInfo").fadeIn(fadeTimerTrans / 3, function ()
                                                         {
+
                                                             moving = false;
                                                             currentStep++
                                                         });
@@ -972,6 +1033,8 @@ class SmoothScroll
             }
             if (currentStep === 0 && !moving)
             {
+                openAudio.play();
+                context.resume();
                 moving = true;
                 $("#controlsInfo").fadeOut(fadeTimerTrans / 4, function ()
                 {
@@ -1036,6 +1099,7 @@ class SmoothScroll
             this.createTransitionEffect(halfwayValue, effectValue.x);
         }).onComplete(() =>
         {
+            scene.distortValue = 0.1;
         }).start();
     }
 
@@ -1159,24 +1223,24 @@ preloadImages.then(images =>
     IMAGES = images.images;
 });
 
-const preloadEverything = [fontStarling, fontParalucent, preloadImages, videoIntro, video2, video3, video4, video5, audio1, audio2, openAudio];
+const preloadEverything = [fontStarling, fontParalucent, preloadImages, videoIntro, audio1, audio2, openAudio, context];
 
 // And then..
 Promise.all(preloadEverything).then(() =>
-{    // Remove the loader
-
-
-    document.body.classList.remove("loading");
-    document.body.classList.add("loaded");
+{
     openAudio.loop = true;
     openAudio.autoplay = true;
     openAudio.crossOrigin = "anonymous";
-// call `handleCanplay` when it music can be played
     openAudio.load();
-    // Get the scroll position
+
+    // videoIntro.play().then(r =>
+    // {
+    //     console.log("played")
+    // });
     getPageYScroll();
-    // Initialize the Smooth Scrolling
     new SmoothScroll();
+    document.body.classList.remove("loading");
+    document.body.classList.add("loaded");
 
     $(".header__title").fadeIn(titleTimer * 2, function ()
     {
@@ -1192,7 +1256,6 @@ Promise.all(preloadEverything).then(() =>
                         {
 
                             introIsOn = false;
-
                         });
                     });
                 });
@@ -1200,3 +1263,6 @@ Promise.all(preloadEverything).then(() =>
         });
     });
 }).catch(console.log);
+
+
+
