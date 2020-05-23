@@ -32,7 +32,7 @@
     <link href="img/faviconsML/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
     <link href="img/faviconsML/manifest.json" rel="manifest">
     <meta content="#ffffff" name="msapplication-TileColor">
-<!--    <meta content="img/faviconsML/ms-icon-144x144.png" name="msapplication-TileImage">-->
+    <!--    <meta content="img/faviconsML/ms-icon-144x144.png" name="msapplication-TileImage">-->
     <meta content="#ffffff" name="theme-color">
 
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
@@ -49,33 +49,36 @@
 </head>
 
 <body class="loading">
-
 <main id="main">
 
     <div id="container">
         <video autoplay class="myVideo" id="myVideoIntro" loop muted style="display: none;">
             <source src="vid/Vid_Intro_1_Rusheen.mp4" type="video/mp4">
         </video>
-        <video autoplay class="myVideo" id="myVideo2" loop muted style="display: none;" preload='none'>
+        <video class="myVideo" id="myVideo2" loop muted style="display: none;">
             <source src="vid/Vid2_City.mp4" type="video/mp4">
         </video>
-        <video autoplay class="myVideo" id="myVideo3" loop muted style="display: none;" preload='none'>
+        <video class="myVideo" id="myVideo3" loop muted style="display: none;">
             <source src="vid/Vid3.mp4" type="video/mp4">
         </video>
-        <video autoplay class="myVideo" id="myVideo4" loop muted style="display: none;" preload='none'>
+        <video class="myVideo" id="myVideo4" loop muted style="display: none;">
             <source src="vid/Vid4.mp4" type="video/mp4">
         </video>
-        <video autoplay class="myVideo" id="myVideo5" loop muted style="display: none;" preload='none'>
+        <video class="myVideo" id="myVideo5" loop muted style="display: none;">
             <source src="vid/Vid5.mp4" type="video/mp4">
         </video>
         <div id="overlay"></div>
         <h1></h1>
+        <audio autoplay class="audio_volume_only" id="openLoop" preload='auto'>
+            <source src="audio/Opening.mp3" type="audio/mp3">
+            Your browser does not support the audio tag.
+        </audio>
         <audio class="audio_volume_only" id="myAudio1" preload='none'>
-            <source src="audio/ML_M.wav" type="audio/wav">
+            <source src="audio/ML_M.mp3" type="audio/mp3">
             Your browser does not support the audio tag.
         </audio>
         <audio class="audio_volume_only" id="myAudio2" preload='none'>
-            <source src="audio/ML_F.wav" type="audio/wav">
+            <source src="audio/ML_F.mp3" type="audio/mp3">
             Your browser does not support the audio tag.
         </audio>
         <div data-scroll id="datascroll">
@@ -85,10 +88,12 @@
                 <br>
                 <div class="info1" id="info1" style="opacity: 100%; text-shadow: 1px 2px 3px #555; display: none">Welcome to Memory Lies | Bréag Cuimhne<br> a work-in-progress piece that explores, memory, time, and technology.</div>
                 <br>
-                <div class="info2" id="info2" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">The piece was created in a national state of emergency, that continues today. It could even continue into the future.                </div>
+                <div class="info2" id="info2" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">It allowed the maker some space to explore different avenues of making new experiences using digital tools. This including
+                    binaural recording and mixing approaches various digital formats as a device for theatre-making, and to research the wider ideas around symbolic interaction and how this could affect our lives.
+                </div>
                 <br>
-                <div class="info3" id="info3" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">
-                    It allowed the maker some space to explore different avenues of making new experiences using digital tools. This including binaural recording and mixing approaches various digital formats as a device for theatre-making, and to research the wider ideas around symbolic interaction and how this could affect our lives
+                <div class="info3" id="info3" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">The piece was created in a national stage of emergency that continues today. An emergency that could continue long into the
+                    future.
                 </div>
                 <br>
                 <div class="info4" id="info4" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">Welcome to memory Lies | Fáilte romhat chuig Bréag Cuimhne</div>
@@ -97,14 +102,17 @@
 
                 <div class="controlsInfo" id="controlsInfo" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">Click to Begin</div>
 
+                <div class="male" id="male" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">Male</div>
+                <div class="female" id="female" style="opacity: 100%; text-shadow: 1px 2px 3px #555;display: none">Female</div>
+
 
                 <!-- <button class="button buttonM" id="male" style="opacity: 100%"><i class="fas fa-male fa-2x"></i></button>
                  <button class="button buttonF" id="female" style="opacity: 100%"><i class="fas fa-female fa-2x"></i></button>-->
             </header>
-<!--            <div class="parent">-->
-<!--                <div class="controlsInfoL" id="choiceInfoL" style="opacity: 100%; text-shadow: 1px 2px 3px #555">(Male)</div>-->
-<!--                <div class="controlsInfoR" id="choiceInfoR" style="opacity: 100%; text-shadow: 1px 2px 3px #555">(Female)</div>-->
-<!--            </div>-->
+            <!--            <div class="parent">-->
+            <!--                <div class="controlsInfoL" id="choiceInfoL" style="opacity: 100%; text-shadow: 1px 2px 3px #555">(Male)</div>-->
+            <!--                <div class="controlsInfoR" id="choiceInfoR" style="opacity: 100%; text-shadow: 1px 2px 3px #555">(Female)</div>-->
+            <!--            </div>-->
             <div class="step1">
                 <div class="item">
                     <div class="item__image">
@@ -153,7 +161,7 @@
             <div class="step6">
                 <div class="item">
                     <div class="item__image">
-                        <img alt="step6" class="js-image" src="img/6.jpg">
+                        <img alt="step6" class="js-image" src="img/MALE.jpg">
                         <p></p>
                     </div>
 
@@ -162,7 +170,7 @@
             <div class="step7">
                 <div class="item">
                     <div class="item__image">
-                        <img alt="step7" class="js-image" src="img/7.jpg">
+                        <img alt="step7" class="js-image" src="img/FEMALE.jpg">
                         <p></p>
                     </div>
 
@@ -209,7 +217,6 @@
     </script>
     </div>
 </main>
-
 
 </body>
 
